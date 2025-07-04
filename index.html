@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Qualidade - Sistema Aprimorado</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-clipboard-check"></i>
+                <span>Gestão de Qualidade</span>
+            </div>
+            <nav class="main-nav">
+                <ul class="nav-list">
+                    <li><a href="#dashboard" class="nav-link active" onclick="showSection('dashboard')">Dashboard</a></li>
+                    <li><a href="#users" class="nav-link" onclick="showSection('users')">Usuários</a></li>
+                    <li><a href="#config" class="nav-link" onclick="showSection('config')">Configurações</a></li>
+                </ul>
+            </nav>
+            <div class="user-profile" onclick="logout()">
+                <i class="fas fa-user-circle"></i>
+                <span>Administrador</span>
+                <i class="fas fa-sign-out-alt" style="margin-left: 10px;"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Dashboard Section -->
+        <section id="dashboard-section" class="content-section active">
+            <div class="dashboard-summary">
+                <h1>Gerenciador de Planos de Ação</h1>
+                <p class="subtitle">Crie, edite e gerencie seus planos de ação de forma eficiente e integrada.</p>
+                
+                <div class="summary-cards">
+                    <div class="card">
+                        <div class="card-icon">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Total de Planos</h3>
+                            <span class="card-number" id="total-plans">0</span>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Planos Pendentes</h3>
+                            <span class="card-number" id="pending-plans">0</span>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Planos Concluídos</h3>
+                            <span class="card-number" id="completed-plans">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <section class="action-buttons">
+                <button class="btn btn-primary" onclick="openCreatePlanModal()">
+                    <i class="fas fa-plus"></i>
+                    Criar Novo Plano
+                </button>
+                <button class="btn btn-secondary" onclick="openGeneralReportModal()">
+                    <i class="fas fa-chart-bar"></i>
+                    Relatório Geral
+                </button>
+                <button class="btn btn-tertiary" onclick="openDetailedReportModal()">
+                    <i class="fas fa-chart-line"></i>
+                    Relatório Detalhado
+                </button>
+            </section>
+
+            <!-- Plans Table -->
+            <section class="plans-table-section">
+                <div class="table-header">
+                    <h2>Planos de Ação</h2>
+                    <div class="table-controls">
+                        <input type="text" placeholder="Buscar planos..." class="search-input" id="search-input">
+                        <button class="btn btn-outline" onclick="refreshPlans()">
+                            <i class="fas fa-sync-alt"></i>
+                            Atualizar
+                        </button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="plans-table" id="plans-table">
+                        <thead>
+                            <tr>
+                                <th>Nome do Plano</th>
+                                <th>Setor Responsável</th>
+                                <th>Responsável</th>
+                                <th>Data de Criação</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="plans-table-body">
+                            <!-- Plans will be dynamically inserted here -->
+                        </tbody>
+                    </table>
+                    <div class="empty-state" id="empty-state">
+                        <i class="fas fa-clipboard"></i>
+                        <h3>Nenhum plano de ação encontrado</h3>
+                        <p>Clique em "Criar Novo Plano" para começar.</p>
+                    </div>
+                </div>
+            </section>
+        </section>
+
+        <!-- Users Section -->
+        <section id="users-section" class="content-section">
+            <div class="section-header">
+                <h1>Gerenciamento de Usuários</h1>
+                <button class="btn btn-primary" onclick="openCreateUserModal()">
+                    <i class="fas fa-user-plus"></i>
+                    Adicionar Usuário
+                </button>
+            </div>
+
+            <div class="users-stats">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Total de Usuários</h3>
+                        <span class="stat-number" id="total-users">0</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Administradores</h3>
+                        <span class="stat-number" id="admin-users">0</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Usuários Ativos</h3>
+                        <span class="stat-number" id="active-users">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="users-table-section">
+                <div class="table-header">
+                    <h2>Lista de Usuários</h2>
+                    <div class="table-controls">
+                        <input type="text" placeholder="Buscar usuários..." class="search-input" id="users-search-input">
+                        <select class="filter-select" id="role-filter">
+                            <option value="">Todos os Perfis</option>
+                            <option value="admin">Administrador</option>
+                            <option value="user">Usuário</option>
+                        </select>
+                        <button class="btn btn-outline" onclick="refreshUsers()">
+                            <i class="fas fa-sync-alt"></i>
+                            Atualizar
+                        </button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th>Nome de Usuário</th>
+                                <th>E-mail</th>
+                                <th>Perfil</th>
+                                <th>Status</th>
+                                <th>Último Login</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body">
+                            <!-- Users will be dynamically inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Configuration Section -->
+        <section id="config-section" class="content-section">
+            <div class="section-header">
+                <h1>Configurações do Sistema</h1>
+                <button class="btn btn-success" onclick="saveAllConfigurations()">
+                    <i class="fas fa-save"></i>
+                    Salvar Todas as Configurações
+                </button>
+            </div>
+
+            <div class="config-tabs">
+                <div class="tab-nav">
+                    <button class="tab-btn active" onclick="showConfigTab('email')">
+                        <i class="fas fa-envelope"></i>
+                        E-mail
+                    </button>
+                    <button class="tab-btn" onclick="showConfigTab('system')">
+                        <i class="fas fa-cog"></i>
+                        Sistema
+                    </button>
+                    <button class="tab-btn" onclick="showConfigTab('database')">
+                        <i class="fas fa-database"></i>
+                        Banco de Dados
+                    </button>
+                    <button class="tab-btn" onclick="showConfigTab('security')">
+                        <i class="fas fa-shield-alt"></i>
+                        Segurança
+                    </button>
+                </div>
+
+                <!-- Email Configuration Tab -->
+                <div id="email-config" class="config-tab active">
+                    <h3>Configurações de E-mail</h3>
+                    <div class="config-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="smtp-server">Servidor SMTP</label>
+                                <input type="text" id="smtp-server" placeholder="smtp.gmail.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="smtp-port">Porta SMTP</label>
+                                <input type="number" id="smtp-port" placeholder="587">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="smtp-username">Usuário SMTP</label>
+                                <input type="email" id="smtp-username" placeholder="seu@email.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="smtp-password">Senha SMTP</label>
+                                <input type="password" id="smtp-password" placeholder="Senha do e-mail">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="email-from">E-mail Remetente</label>
+                            <input type="email" id="email-from" placeholder="noreply@empresa.com">
+                        </div>
+                        <div class="form-actions">
+                            <button class="btn btn-outline" onclick="testEmailConfig()">
+                                <i class="fas fa-paper-plane"></i>
+                                Testar Configuração
+                            </button>
+                            <button class="btn btn-primary" onclick="saveEmailConfig()">
+                                <i class="fas fa-save"></i>
+                                Salvar E-mail
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Configuration Tab -->
+                <div id="system-config" class="config-tab">
+                    <h3>Configurações do Sistema</h3>
+                    <div class="config-form">
+                        <div class="form-group">
+                            <label for="system-name">Nome do Sistema</label>
+                            <input type="text" id="system-name" value="Gestão de Qualidade">
+                        </div>
+                        <div class="form-group">
+                            <label for="company-name">Nome da Empresa</label>
+                            <input type="text" id="company-name" placeholder="Nome da sua empresa">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="timezone">Fuso Horário</label>
+                                <select id="timezone">
+                                    <option value="America/Sao_Paulo">Brasília (UTC-3)</option>
+                                    <option value="America/New_York">Nova York (UTC-5)</option>
+                                    <option value="Europe/London">Londres (UTC+0)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="language">Idioma</label>
+                                <select id="language">
+                                    <option value="pt-BR">Português (Brasil)</option>
+                                    <option value="en-US">English (US)</option>
+                                    <option value="es-ES">Español</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="maintenance-mode">
+                                <span class="checkmark"></span>
+                                Modo de Manutenção
+                            </label>
+                        </div>
+                        <div class="form-actions">
+                            <button class="btn btn-primary" onclick="saveSystemConfig()">
+                                <i class="fas fa-save"></i>
+                                Salvar Sistema
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Database Configuration Tab -->
+                <div id="database-config" class="config-tab">
+                    <h3>Configurações do Banco de Dados</h3>
+                    <div class="config-form">
+                        <div class="form-group">
+                            <label for="db-type">Tipo de Banco</label>
+                            <select id="db-type">
+                                <option value="sqlite">SQLite (Local)</option>
+                                <option value="supabase">Supabase (Cloud)</option>
+                                <option value="postgresql">PostgreSQL</option>
+                            </select>
+                        </div>
+                        <div id="supabase-config" class="db-config-section">
+                            <div class="form-group">
+                                <label for="supabase-url">URL do Supabase</label>
+                                <input type="url" id="supabase-url" placeholder="https://seu-projeto.supabase.co">
+                            </div>
+                            <div class="form-group">
+                                <label for="supabase-key">Chave Anônima</label>
+                                <input type="password" id="supabase-key" placeholder="Chave anônima do Supabase">
+                            </div>
+                            <div class="form-group">
+                                <label for="supabase-service-key">Chave de Serviço</label>
+                                <input type="password" id="supabase-service-key" placeholder="Chave de serviço do Supabase">
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button class="btn btn-outline" onclick="testDatabaseConnection()">
+                                <i class="fas fa-plug"></i>
+                                Testar Conexão
+                            </button>
+                            <button class="btn btn-primary" onclick="saveDatabaseConfig()">
+                                <i class="fas fa-save"></i>
+                                Salvar Banco
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Configuration Tab -->
+                <div id="security-config" class="config-tab">
+                    <h3>Configurações de Segurança</h3>
+                    <div class="config-form">
+                        <div class="form-group">
+                            <label for="session-timeout">Timeout de Sessão (minutos)</label>
+                            <input type="number" id="session-timeout" value="60" min="5" max="480">
+                        </div>
+                        <div class="form-group">
+                            <label for="password-policy">Política de Senha</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="require-uppercase">
+                                    <span class="checkmark"></span>
+                                    Exigir letras maiúsculas
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="require-numbers">
+                                    <span class="checkmark"></span>
+                                    Exigir números
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="require-special">
+                                    <span class="checkmark"></span>
+                                    Exigir caracteres especiais
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="min-password-length">Tamanho mínimo da senha</label>
+                            <input type="number" id="min-password-length" value="8" min="6" max="20">
+                        </div>
+                        <div class="form-actions">
+                            <button class="btn btn-primary" onclick="saveSecurityConfig()">
+                                <i class="fas fa-save"></i>
+                                Salvar Segurança
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Create User Modal -->
+    <div class="modal" id="create-user-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Novo Usuário</h2>
+                <button class="close-btn" onclick="closeModal('create-user-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="create-user-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="user-username">Nome de Usuário*</label>
+                            <input type="text" id="user-username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="user-email">E-mail*</label>
+                            <input type="email" id="user-email" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="user-password">Senha*</label>
+                            <input type="password" id="user-password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="user-role">Perfil*</label>
+                            <select id="user-role" required>
+                                <option value="user">Usuário</option>
+                                <option value="admin">Administrador</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('create-user-modal')">Cancelar</button>
+                <button class="btn btn-primary" onclick="createUser()">Criar Usuário</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Plan Modal -->
+    <div class="modal" id="create-plan-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Novo Plano de Ação</h2>
+                <button class="close-btn" onclick="closeModal('create-plan-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-subtitle">Defina os detalhes do plano e adicione as ações necessárias.</p>
+                <form id="create-plan-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="plan-name">Nome do Plano*</label>
+                            <input type="text" id="plan-name" placeholder="Ex: Plano de Melhoria Contínua Q1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="responsible-sector">Setor Responsável*</label>
+                            <input type="text" id="responsible-sector" placeholder="Digite o setor responsável" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="responsible-person">Responsável pela Elaboração*</label>
+                            <input type="text" id="responsible-person" placeholder="Nome completo do responsável" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="responsible-email">E-mail do Responsável (Elaboração)*</label>
+                            <input type="email" id="responsible-email" placeholder="Ex: gestor@empresa.com" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="creation-date">Data de Criação*</label>
+                            <input type="date" id="creation-date" required>
+                        </div>
+                    </div>
+                </form>
+                
+                <div class="actions-section">
+                    <div class="section-header">
+                        <h3>Ações do Plano (<span id="actions-count">0</span>)</h3>
+                        <button class="btn btn-success" onclick="openAddActionModal()">
+                            <i class="fas fa-plus"></i>
+                            Adicionar Nova Ação
+                        </button>
+                    </div>
+                    <div class="actions-list" id="actions-list">
+                        <div class="empty-actions">
+                            <p>Nenhuma ação adicionada ainda.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('create-plan-modal')">Cancelar</button>
+                <button class="btn btn-primary" onclick="savePlan()">Salvar Plano de Ação</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Action Modal -->
+    <div class="modal" id="add-action-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Nova Ação</h2>
+                <button class="close-btn" onclick="closeModal('add-action-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-subtitle">Adicione os detalhes para a nova ação. Campos marcados com * são obrigatórios.</p>
+                <form id="add-action-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="action-title">Título da Ação*</label>
+                            <input type="text" id="action-title" placeholder="Ex: Implementar novo sistema de..." required>
+                        </div>
+                        <div class="form-group">
+                            <label for="action-responsible">Responsável pela Ação*</label>
+                            <input type="text" id="action-responsible" placeholder="Nome completo" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="action-description">Descrição Técnica/Detalhada</label>
+                        <textarea id="action-description" placeholder="Detalhes técnicos, passos para execução, etc." rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="action-justification">Justificativa da Ação*</label>
+                        <textarea id="action-justification" placeholder="Por que esta ação é necessária?" rows="3" required></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="action-email">E-mail do Responsável (Ação)*</label>
+                            <input type="email" id="action-email" placeholder="email@dominio.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="action-cost">Custo Estimado (R$)</label>
+                            <input type="number" id="action-cost" placeholder="Ex: 1500.00" step="0.01">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="action-resource">Fonte do Recurso</label>
+                            <input type="text" id="action-resource" placeholder="Ex: Orçamento Interno, Financiamento X">
+                        </div>
+                        <div class="form-group">
+                            <label for="action-date">Data Prevista de Execução*</label>
+                            <input type="date" id="action-date" required>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('add-action-modal')">Cancelar</button>
+                <button class="btn btn-primary" onclick="addActionToPlan()">Adicionar Ação ao Plano</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- General Report Modal -->
+    <div class="modal" id="general-report-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Relatório Geral de Planos de Ação</h2>
+                <button class="close-btn" onclick="closeModal('general-report-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="report-summary">
+                    <div class="report-card">
+                        <h4>Total de Planos</h4>
+                        <span class="report-number" id="report-total">0</span>
+                    </div>
+                    <div class="report-card">
+                        <h4>Ações Pendentes</h4>
+                        <span class="report-number" id="report-pending">0</span>
+                    </div>
+                    <div class="report-card">
+                        <h4>Ações Concluídas</h4>
+                        <span class="report-number" id="report-completed">0</span>
+                    </div>
+                </div>
+                <div class="export-options">
+                    <p>Seu relatório foi gerado. Use os botões abaixo para exportar.</p>
+                    <button class="btn btn-primary" onclick="exportToPDF()">
+                        <i class="fas fa-file-pdf"></i>
+                        Exportar para PDF
+                    </button>
+                    <button class="btn btn-success" onclick="exportToExcel()">
+                        <i class="fas fa-file-excel"></i>
+                        Exportar para Excel
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('general-report-modal')">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Report Modal -->
+    <div class="modal" id="detailed-report-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Gerar Relatório Detalhado</h2>
+                <button class="close-btn" onclick="closeModal('detailed-report-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-subtitle">Selecione o status das ações e se deseja incluir apenas as atrasadas.</p>
+                <form id="detailed-report-form">
+                    <div class="form-group">
+                        <label for="status-filter">Status da Ação</label>
+                        <select id="status-filter">
+                            <option value="all">Todos</option>
+                            <option value="pending">Pendente</option>
+                            <option value="in-progress">Em Andamento</option>
+                            <option value="completed">Concluído</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="overdue-only">
+                            <span class="checkmark"></span>
+                            Incluir apenas ações atrasadas
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('detailed-report-modal')">Cancelar</button>
+                <button class="btn btn-primary" onclick="generateDetailedReport()">
+                    <i class="fas fa-download"></i>
+                    Gerar Relatório
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div class="toast" id="toast">
+        <div class="toast-content">
+            <i class="toast-icon"></i>
+            <span class="toast-message"></span>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
