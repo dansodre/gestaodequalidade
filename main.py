@@ -23,7 +23,7 @@ app.secret_key = 'your-secret-key-change-this-in-production'
 CORS(app, supports_credentials=True)
 
 # Registrar blueprints
-app.register_blueprint(auth_bp)
+app.register_blueprint(auth_bp, url_prefix='/api/auth')
 app.register_blueprint(plans_bp)
 app.register_blueprint(users_bp)
 app.register_blueprint(config_bp)
